@@ -222,3 +222,43 @@ async def stop(ctx):
         await ctx.send('No music playing failed to stop')
 
 queues = {}
+
+# queue command
+
+@bot.command(pass_context=True, aliases=['q', 'que'])
+async def queue(ctx, *url: str):
+    queues_infile = os.path.isdir('./Queue')
+    if queues_infile is False:
+        os.mkdir('Queue')
+    DIR = os.path.abspath(os.path.realpath('Queue'))
+    q_num = len(os.listdir(DIR))
+    q_num += 1
+    add_queue = True
+    while add_queue:
+        if q_num in queues:
+            q_num += 1
+        else:
+            add_queue = False
+            queues[q_num] = q_num
+
+    queue_path = os.path.abspath(
+        os.path.realpath('Queue') + f'\song{q_num}.%(ext)s')
+
+    ydl_opts = {'format': 'bestaudio/best', 'quiet': True, 'outtmpl': queue_path, 'postprocessors': [
+        {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192', }], }
+
+    song_search = ' '.join(url)
+
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            print('Downloading audio now\n')
+            ydl.download([f'ytsearch1:{song_search}'])
+    except:
+        print('FALLBACK: youtube-dl does not support this URL, using Spotify (This is normal if Spotify URL)')
+        q_path = os.path.abspath(os.path.realpath('Queue'))
+        system(f"spotdl -ff song{q_num} -f " + '"' +
+               q_path + '"' + ' -s ' + song_search)
+
+    await ctx.send('Adding song ' + str(q_num) + ' to the queue')
+
+    print('Song added to the queue\n')
