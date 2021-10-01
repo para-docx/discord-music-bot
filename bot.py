@@ -185,3 +185,18 @@ async def pause(ctx):
     else:
         print('Music not playing failed pause')
         await ctx.send('Music not playing failed pause')
+
+# resume command
+
+@bot.command(pass_context=True, aliases=['r', 'res'])
+async def resume(ctx):
+
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_paused():
+        print('Resumed music')
+        voice.resume()
+        await ctx.send('Resumed music')
+    else:
+        print('Music is not paused')
+        await ctx.send('Music is not paused')
