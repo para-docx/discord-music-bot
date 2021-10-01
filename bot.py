@@ -48,3 +48,20 @@ async def help(ctx):
         name=".volume", value="Changes the volume. Default is 23. Volume limit = 1-100. Example: .volume 30", inline=False)
 
     await author.send(embed=help_embed)
+
+# joins the voice channel
+
+@bot.command(pass_context=True, aliases=['j', 'joi'])
+async def join(ctx):
+    global voice
+    channel = ctx.message.author.voice.channel
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    if voice is not None:
+        return await voice.move_to(channel)
+
+    await channel.connect()
+
+    print(f'The bot has connected to {channel}\n')
+
+    await ctx.send(f'Joined {channel}')
