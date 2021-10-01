@@ -200,3 +200,25 @@ async def resume(ctx):
     else:
         print('Music is not paused')
         await ctx.send('Music is not paused')
+
+# stop command
+
+@bot.command(pass_context=True, aliases=['s', 'sto'])
+async def stop(ctx):
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    queues.clear()
+
+    queue_infile = os.path.isdir('./Queue')
+    if queue_infile is True:
+        shutil.rmtree('./Queue')
+
+    if voice and voice.is_playing():
+        print('Music stopped')
+        voice.stop()
+        await ctx.send('Music stopped')
+    else:
+        print('No music playing failed to stop')
+        await ctx.send('No music playing failed to stop')
+
+queues = {}
